@@ -12,22 +12,12 @@
 - name: Recharger systemd
   command: systemctl daemon-reload
 
-- name: Configurer les variables d'environnement (Proxy)
-  template:
-    src: rke2-proxy.j2
-    dest: /etc/default/rke2-server
-    mode: '0644'
-
 - name: Installer RKE2 server
   shell: |
     curl -sfL https://get.rke2.io | \
     INSTALL_RKE2_TYPE=server \
-    INSTALL_RKE2_VERSION=v1.33.6+rke2r1 \
+    INSTALL_RKE2_VERSION=v1.34.3+rke2r3 \
     sh -
-  environment:
-    http_proxy: "{{ proxy_url }}"
-    https_proxy: "{{ proxy_url }}"
-    no_proxy: "{{ no_proxy_list }}"
 
 - name: Démarrer le service RKE2
   systemd:

@@ -8,3 +8,4 @@
   command: cilium install -f /root/cilium.yaml
   environment:
     KUBECONFIG: /etc/rancher/rke2/rke2.yaml
+    PATH: "{{ ansible_env.PATH }}:/usr/local/bin"

@@ -8,3 +8,8 @@
     tar xzvf cilium-linux-amd64.tar.gz -C /usr/local/bin
   args:
     creates: /usr/local/bin/cilium
+
+- name: Ajouter Cilium au PATH global
+  shell: ln -sf /usr/local/bin/cilium /usr/bin/cilium
+  args:
+    creates: /usr/bin/cilium

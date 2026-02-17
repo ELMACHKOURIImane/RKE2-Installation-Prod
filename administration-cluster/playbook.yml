@@ -8,14 +8,9 @@
   become: true
   roles:
     - rke2-server
+    - cilium
 
 - hosts: master-join
   become: true
   roles:
     - rke2-server-join
-
-- hosts: master[0]
-  become: true
-  roles:
-    - cilium
-

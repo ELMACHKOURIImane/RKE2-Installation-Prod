@@ -1,0 +1,78 @@
+---
+- name: Uninstall RKE2 completely
+  hosts: rke2_nodes
+  become: true
+  gather_facts: false
+
+  tasks:
+
+    - name: Stop rke2-server service (if exists)
+      systemd:
+        name: rke2-server
+        state: stopped
+      ignore_errors: yes
+
+    - name: Stop rke2-agent service (if exists)
+      systemd:
+        name: rke2-agent
+        state: stopped
+      ignore_errors: yes
+
+    # Vérifie si rke2-killall existe
+    - name: Check if rke2-killall exists
+      stat:
+        path: /usr/bin/rke2-killall.sh
+      register: killall_script
+
+    - name: Run rke2-killall
+      shell: /usr/bin/rke2-killall.sh
+      when: killall_script.stat.exists
+
+    # Vérifie si rke2-uninstall existe
+    - name: Check if rke2-uninstall exists
+      stat:
+        path: /usr/bin/rke2-uninstall.sh
+      register: uninstall_script
+
+    - name: Run rke2-uninstall
+      shell: /usr/bin/rke2-uninstall.sh
+      when: uninstall_script.stat.exists
+
+    - name: Remove RKE2 directories
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/rancher
+        - /var/lib/rancher
+        - /var/lib/kubelet
+        - /var/lib/etcd
+        - /var/lib/cni
+        - /opt/cni
+        - /run/k3s
+        - /run/rke2
+        - /var/lib/rancher/rke2
+        - /etc/systemd/system/rke2-server.service
+        - /etc/systemd/system/rke2-agent.service
+        - /usr/local/bin/rke2
+        - /usr/local/bin/kubectl
+        - /usr/local/bin/crictl
+        - /usr/local/bin/ctr
+
+    - name: Remove containerd leftovers
+      file:
+        path: /var/lib/containerd
+        state: absent
+      ignore_errors: yes
+
+    - name: Reload systemd
+      command: systemctl daemon-reload
+
+
+    - name: Remove CNI interfaces
+      shell: |
+        ip link delete cni0 2>/dev/null || true
+        ip link delete flannel.1 2>/dev/null || true
+        ip link delete vxlan.calico 2>/dev/null || true
+      ignore_errors: yes
+
