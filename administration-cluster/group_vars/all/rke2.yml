@@ -1,0 +1,8 @@
+cluster_cidr: 10.100.0.0/16
+service_cidr: 10.110.0.0/16
+cluster_dns: 10.110.0.10
+cluster_domain: arman-projects.com
+
+etcd_quota: 2048000000
+etcd_snapshot_cron: "0 3 * * *"
+etcd_snapshot_retention: 10

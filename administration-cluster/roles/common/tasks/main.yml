@@ -1,0 +1,111 @@
+---
+# === 1. Désactiver le pare-feu firewalld ===
+#- name: Désactiver firewalld (pare-feu par défaut sur Red Hat)
+#  systemd:
+#    name: firewalld
+#    state: stopped
+#    enabled: false
+#  ignore_errors: true
+
+# === 2. Configurer le proxy dans Red Hat ===
+
+#- name: Configurer le proxy pour DNF (Red Hat)
+#  lineinfile:
+#    path: /etc/dnf/dnf.conf
+#    line: "proxy={{ proxy_url }}"
+#    state: present
+
+#- name: Nettoyer le cache DNF
+#  command: dnf clean all
+
+# === 3. Mise à jour du système ===
+#- name: Mettre à jour tous les paquets
+#  yum:
+#    name: "*"
+#    state: latest
+
+# Installer EPEL pour RHEL/CentOS 9
+#- name: Installer epel-release via URL pour RHEL/CentOS 9
+#  command: dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+
+- name: Installer les dépendances nécessaires
+  yum:
+    name:
+      - curl
+      - tar
+      - socat
+      - conntrack-tools
+      - iptables
+      - ca-certificates
+      - nfs-utils
+    state: present
+
+# === 3. Désactiver le swap (nécessaire pour Kubernetes) ===
+- name: Désactiver le swap immédiatement
+  command: swapoff -a
+  ignore_errors: true
+
+- name: Désactiver le swap au redémarrage
+  replace:
+    path: /etc/fstab
+    regexp: '^([^#].*\s+swap\s+.*)$'
+    replace: '# \1'
+  ignore_errors: true
+
+# === 4. Charger les modules kernel requis ===
+- name: Charger les modules kernel requis
+  modprobe:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - br_netfilter
+    - overlay
+
+- name: Persister les modules kernel
+  copy:
+    dest: /etc/modules-load.d/k8s.conf
+    content: |
+      br_netfilter
+      overlay
+    mode: '0644'
+
+- name: Appliquer la configuration sysctl Kubernetes
+  copy:
+    dest: /etc/sysctl.conf
+    content: |
+      net.ipv4.ip_forward=1
+      net.ipv4.conf.all.send_redirects=0
+      net.ipv4.conf.default.send_redirects=0
+      net.ipv4.conf.default.accept_source_route=0
+      net.ipv4.conf.all.accept_redirects=0
+      net.ipv4.conf.default.accept_redirects=0
+      net.ipv4.conf.all.log_martians=1
+      net.ipv4.conf.default.log_martians=1
+      net.ipv4.conf.all.rp_filter=1
+      net.ipv4.conf.default.rp_filter=1
+      net.ipv6.conf.all.accept_ra=0
+      net.ipv6.conf.default.accept_ra=0
+      net.ipv6.conf.all.accept_redirects=0
+      net.ipv6.conf.default.accept_redirects=0
+      kernel.keys.root_maxbytes=25000000
+      kernel.keys.root_maxkeys=1000000
+      kernel.panic=10
+      kernel.panic_on_oops=1
+      vm.overcommit_memory=1
+      vm.panic_on_oom=0
+      net.ipv4.ip_local_reserved_ports=30000-32767
+      net.bridge.bridge-nf-call-iptables=1
+      net.bridge.bridge-nf-call-arptables=1
+      net.bridge.bridge-nf-call-ip6tables=1
+    mode: '0644'
+
+- name: Recharger sysctl
+  command: sysctl --system
+
+
+# === 6. Nettoyage ===
+- name: Nettoyer les paquets inutiles
+  yum:
+    autoremove: yes
+
+

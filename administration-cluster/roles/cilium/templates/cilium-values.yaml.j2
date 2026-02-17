@@ -1,0 +1,44 @@
+cluster:
+  name: {{ cluster_name }}
+  id: {{ cluster_id }}
+
+kubeProxyReplacement: strict
+
+prometheus:
+  enabled: true
+  serviceMonitor:
+    enabled: false
+
+dashboards:
+  enabled: true
+
+hubble:
+  relay:
+    enabled: true
+    prometheus:
+      enabled: true
+  ui:
+    enabled: true
+    baseUrl: "/"
+  metrics:
+    enabled:
+      - dns:query;ignoreAAAA
+      - drop
+      - tcp
+      - flow
+      - icmp
+      - http
+    dashboards:
+      enabled: true
+
+operator:
+  prometheus:
+    enabled: true
+  dashboards:
+    enabled: true
+
+gatewayAPI:
+  enabled: true
+
+envoy:
+  enabled: true

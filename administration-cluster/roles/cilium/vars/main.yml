@@ -1,0 +1,3 @@
+cilium_version: 1.15.4
+cluster_name: cluster-admin
+cluster_id: 10
