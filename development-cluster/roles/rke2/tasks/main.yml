@@ -34,3 +34,14 @@
     ln -sf /etc/rancher/rke2/rke2.yaml ~/.kube/config
   args:
     executable: /bin/bash
+
+- name: Générer le fichier de config containerd pour registry privée
+  template:
+    src: registries.yaml.j2
+    dest: /etc/rancher/rke2/registries.yaml
+    mode: '0644'
+
+- name: Redémarrer RKE2 pour prendre en compte la nouvelle registry
+  systemd:
+    name: "rke2-{{ install_type }}"
+    state: restarted

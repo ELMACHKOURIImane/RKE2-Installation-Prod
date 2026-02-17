@@ -1,0 +1,4 @@
+registry_host: "10.99.98.42:5000"
+registry_user: "monuser"
+registry_password: "monpassword"
+

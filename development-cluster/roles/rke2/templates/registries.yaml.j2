@@ -1,0 +1,10 @@
+mirrors:
+  "{{ registry_host }}":
+    endpoint:
+      - "https://{{ registry_host }}"
+
+configs:
+  "{{ registry_host }}":
+    auth:
+      username: "{{ registry_user }}"
+      password: "{{ registry_password }}"
