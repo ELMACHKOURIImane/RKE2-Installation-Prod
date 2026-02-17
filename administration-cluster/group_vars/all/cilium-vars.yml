@@ -3,6 +3,10 @@ service_cidr: 10.43.0.0/16
 cluster_dns: 10.43.0.10
 cluster_domain: cluster.local
 
+cilium_version: 1.15.4
+cluster_name: cluster-admin
+cluster_id: 10
+
 etcd_quota: 2048000000
 etcd_snapshot_cron: "0 3 * * *"
 etcd_snapshot_retention: 10
