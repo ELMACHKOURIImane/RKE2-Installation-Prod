@@ -1,0 +1,11 @@
+---
+- hosts: all
+  become: true
+  roles:
+    - common
+
+- hosts: rke2
+  become: true
+  roles:
+    - role: rke2
+    - role: cilium

@@ -1,0 +1,5 @@
+tls_sans:
+  - "gcam-admin-master1"
+  - "gcam-admin-master2"
+  - "gcam-admin-master3"
+

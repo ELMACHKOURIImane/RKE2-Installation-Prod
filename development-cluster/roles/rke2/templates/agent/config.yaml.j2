@@ -1,0 +1,11 @@
+write-kubeconfig-mode: "0644"
+node-name: "{{ inventory_hostname }}"
+server: "https://{{ hostvars[groups['rke2'] | selectattr('rke2_role','equalto','server') | list | first].ansible_host }}:9345"
+token: "{{ token }}"
+cni: none
+disable-kube-proxy: true
+cluster-cidr: "{{ cluster_cidr }}"
+service-cidr: "{{ service_cidr }}"
+cluster-dns: "{{ cluster_dns }}"
+cluster-domain: "{{ cluster_domain }}"
+protect-kernel-defaults: true

@@ -1,0 +1,36 @@
+- name: Créer dossier de config
+  file:
+    path: /etc/rancher/rke2
+    state: directory
+
+- name: Déterminer type d'installation
+  set_fact:
+    install_type: "{{ 'server' if rke2_role == 'server' else 'agent' }}"
+
+- name: Générer fichier config
+  template:
+    src: "{{ install_type }}/config.yaml.j2"
+    dest: /etc/rancher/rke2/config.yaml
+
+- name: Installer RKE2
+  shell: |
+    curl -sfL https://get.rke2.io | \
+    INSTALL_RKE2_TYPE={{ install_type }} \
+    INSTALL_RKE2_VERSION=v1.34.3+rke2r3 \
+    sh -
+  args:
+    creates: /usr/local/bin/rke2
+
+- name: Démarrer service RKE2
+  systemd:
+    name: "rke2-{{ install_type }}"
+    state: started
+    enabled: true
+
+- name: Ajouter kubectl au PATH
+  shell: |
+    ln -sf $(find /var/lib/rancher/rke2/data/ -name kubectl | head -n 1) /usr/bin/kubectl
+    mkdir -p ~/.kube
+    ln -sf /etc/rancher/rke2/rke2.yaml ~/.kube/config
+  args:
+    executable: /bin/bash
