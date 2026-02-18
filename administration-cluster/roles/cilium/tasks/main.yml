@@ -7,6 +7,10 @@
       https://github.com/cilium/cilium-cli/releases/download/${CILIUM_CLI_VERSION}/cilium-linux-amd64.tar.gz{,.sha256sum}
     sha256sum --check cilium-linux-amd64.tar.gz.sha256sum
     tar xzvf cilium-linux-amd64.tar.gz -C /usr/local/bin
+  environment:
+    HTTP_PROXY: "{{ proxy_url }}"
+    HTTPS_PROXY: "{{ proxy_url }}"
+    NO_PROXY: "{{ no_proxy_list }}"
   args:
     creates: /usr/local/bin/cilium
 
