@@ -9,6 +9,12 @@
     src: config.yaml.j2
     dest: /etc/rancher/rke2/config.yaml
 
+- name: Configurer les variables d'environnement (Proxy)
+  template:
+    src: rke2-proxy.j2
+    dest: /etc/default/rke2-server
+    mode: '0644'
+
 - name: Recharger systemd
   command: systemctl daemon-reload
 
@@ -18,6 +24,10 @@
     INSTALL_RKE2_TYPE=server \
     INSTALL_RKE2_VERSION=v1.34.3+rke2r3 \
     sh -
+  environment:
+    HTTP_PROXY: "{{ proxy_url }}"
+    HTTPS_PROXY: "{{ proxy_url }}"
+    NO_PROXY: "{{ no_proxy_list }}"
 
 - name: Démarrer le service RKE2
   systemd:

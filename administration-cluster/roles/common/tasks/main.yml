@@ -7,6 +7,19 @@
     enabled: false
   ignore_errors: true
 
+# === 2. Installer les dépendances nécessaires  ===
+- name: Installer les dépendances nécessaires
+  yum:
+    name:
+      - curl
+      - tar
+      - socat
+      - conntrack-tools
+      - iptables
+      - ca-certificates
+      - nfs-utils
+    state: present
+
 # === 3. Désactiver le swap (nécessaire pour Kubernetes) ===
 - name: Désactiver le swap immédiatement
   command: swapoff -a

@@ -4,8 +4,18 @@
   roles:
     - common
 
-- hosts: rke2
+- hosts: master
   become: true
   roles:
-    - role: rke2
-    - role: cilium
+    - rke2-server
+    - cilium
+
+- hosts: master-join
+  become: true
+  roles:
+    - rke2-server-join
+
+- hosts: worker
+  become: true
+  roles:
+    - rke2-agent
