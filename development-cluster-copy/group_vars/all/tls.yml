@@ -1,5 +1,0 @@
-tls_sans:
-  - "gcam-dev-master1"
-  - "gcam-dev-master2"
-  - "gcam-dev-master3"
-  - "gcam-dev-worker1"
