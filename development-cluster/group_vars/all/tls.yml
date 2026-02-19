@@ -1,5 +1,5 @@
 tls_sans:
-  - "gcam-admin-master1"
-  - "gcam-admin-master2"
-  - "gcam-admin-master3"
-
+  - "gcam-dev-master1"
+  - "gcam-dev-master2"
+  - "gcam-dev-master3"
+  - "gcam-dev-worker1"

@@ -14,3 +14,4 @@
   become: true
   roles:
     - rke2-server-join
+    - cilium

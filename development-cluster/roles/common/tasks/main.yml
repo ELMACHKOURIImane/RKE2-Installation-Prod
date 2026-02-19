@@ -7,6 +7,19 @@
     enabled: false
   ignore_errors: true
 
+# === Désactiver SELinux (nécessaire pour Cilium / eBPF) ===
+
+- name: Mettre SELinux en permissive immédiatement
+  command: setenforce 0
+  ignore_errors: true
+
+- name: Désactiver SELinux définitivement
+  replace:
+    path: /etc/selinux/config
+    regexp: '^SELINUX='
+    replace: 'SELINUX=disabled'
+  ignore_errors: true
+
 # === 2. Installer les dépendances nécessaires  ===
 - name: Installer les dépendances nécessaires
   yum:
