@@ -1,0 +1,49 @@
+write-kubeconfig-mode: "0644"
+node-name: "{{ inventory_hostname }}"
+server: "https://{{ hostvars['gcam-dev-master1'].ansible_host }}:9345"
+token: "{{ token }}"
+tls-san:
+{% for san in tls_sans %}
+  - {{ san }}
+{% endfor %}
+write-kubeconfig-mode: "0644"
+node-name: "{{ inventory_hostname }}"
+token: "{{ token }}"
+
+advertise-address: "{{ ansible_host }}"
+
+tls-san:
+{% for san in tls_sans %}
+  - {{ san }}
+{% endfor %}
+
+# Cilium
+cni: none
+disable-kube-proxy: true
+
+cluster-cidr: "{{ cluster_cidr }}"
+service-cidr: "{{ service_cidr }}"
+cluster-dns: "{{ cluster_dns }}"
+cluster-domain: "{{ cluster_domain }}"
+
+etcd-arg:
+  - "--quota-backend-bytes={{ etcd_quota }}"
+etcd-snapshot-schedule-cron: "{{ etcd_snapshot_cron }}"
+etcd-snapshot-retention: {{ etcd_snapshot_retention }}
+
+disable:
+  - rke2-ingress-nginx
+
+kube-apiserver-arg:
+  - "--default-not-ready-toleration-seconds=30"
+  - "--default-unreachable-toleration-seconds=30"
+
+kube-controller-manager-arg:
+  - "--node-monitor-period=4s"
+
+kubelet-arg:
+  - "--node-status-update-frequency=4s"
+  - "--max-pods=100"
+
+egress-selector-mode: disabled
+protect-kernel-defaults: true

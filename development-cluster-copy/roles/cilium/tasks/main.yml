@@ -1,0 +1,33 @@
+---
+- name: Installer Cilium CLI
+  shell: |
+    set -e
+    CILIUM_CLI_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium-cli/main/stable.txt)
+    curl -L --remote-name-all \
+      https://github.com/cilium/cilium-cli/releases/download/${CILIUM_CLI_VERSION}/cilium-linux-amd64.tar.gz{,.sha256sum}
+    sha256sum --check cilium-linux-amd64.tar.gz.sha256sum
+    tar xzvf cilium-linux-amd64.tar.gz -C /usr/local/bin
+  environment:
+    HTTP_PROXY: "{{ proxy_url }}"
+    HTTPS_PROXY: "{{ proxy_url }}"
+    NO_PROXY: "{{ no_proxy_list }}"
+  args:
+    creates: /usr/local/bin/cilium
+
+- name: Ajouter Cilium au PATH global
+  file:
+    src: /usr/local/bin/cilium
+    dest: /usr/bin/cilium
+    state: link
+
+- name: Générer le fichier values Cilium
+  template:
+    src: cilium-values.yaml.j2
+    dest: /root/cilium.yaml
+    mode: '0644'
+
+- name: Installer Cilium dans le cluster RKE2
+  command: cilium install -f /root/cilium.yaml
+  environment:
+    KUBECONFIG: /etc/rancher/rke2/rke2.yaml
+    PATH: "{{ ansible_env.PATH }}:/usr/local/bin"

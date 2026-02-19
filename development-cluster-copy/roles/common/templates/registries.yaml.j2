@@ -1,0 +1,12 @@
+mirrors:
+  "{{ private_registry }}":
+    endpoint:
+      - "{{ registry_proto }}://{{ private_registry }}"
+
+{% if registry_username | length > 0 %}
+configs:
+  "{{ private_registry }}":
+    auth:
+      username: "{{ registry_username }}"
+      password: "{{ registry_password }}"
+{% endif %}
