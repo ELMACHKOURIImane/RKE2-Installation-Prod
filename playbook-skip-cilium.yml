@@ -1,0 +1,30 @@
+---
+- hosts: all
+  become: true
+  roles:
+    - common
+
+
+- hosts: master
+  become: true
+
+  pre_tasks:
+    - name: Vérifier si Cilium est déjà installé
+      command: kubectl -n kube-system get ds cilium
+      environment:
+        KUBECONFIG: /etc/rancher/rke2/rke2.yaml
+      register: cilium_check
+      ignore_errors: true
+      changed_when: false
+
+  roles:
+    - rke2-server
+
+    - role: cilium
+      when: cilium_check.rc != 0
+
+
+- hosts: master-join
+  become: true
+  roles:
+    - rke2-server-join
