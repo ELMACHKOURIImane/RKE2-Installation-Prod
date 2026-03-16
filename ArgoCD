@@ -1,0 +1,87 @@
+global:
+  domain: argocd.cam.lab
+
+configs:
+  params:
+    server.insecure: true
+
+server:
+  replicas: 2
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    hosts:
+      - argocd.cam.lab
+    tls:
+      - secretName: argocd-tls
+        hosts:
+          - argocd.cam.lab
+
+controller:
+  enableStatefulSet: true
+  replicas: 1
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+repoServer:
+  replicas: 2
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+applicationSet:
+  replicas: 2
+
+notifications:
+  replicas: 2
+
+#Désactive redis simple
+redis:
+  enabled: false
+
+#Active redis HA
+redis-ha:
+  enabled: true
+  replicas: 3
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 300m
+      memory: 512Mi
+
+dex:
+  replicas: 1
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+
+
+helm install argocd argo/argo-cd \
+  --version 9.4.1 \
+  --namespace argocd \
+  --create-namespace \
+  -f argocd-values.yaml
